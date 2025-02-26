@@ -4,56 +4,97 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/OxyX1/oxyum-css@3a324169cae2d1506e174dd1a96efe79fd7c9302/oxyum.css">
-  <title>Chat App with Config</title>
+  <title>Discord-Style Chat</title>
   <style>
-    .modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-      width: 300px;
-    }
-    .modal.active { display: block; }
-    .overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      display: none;
-    }
-    .overlay.active { display: block; }
+    *:focus { outline: none !important; }
+    body, html { height: 100%; margin: 0; padding: 0; }
+    .container { display: flex; height: 100vh; overflow: hidden; }
+    .server-list { width: 80px; background: #202225; display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
+    .server { width: 50px; height: 50px; background: #36393f; border-radius: 50%; margin: 10px 0; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; cursor: pointer; }
+    .server:hover { background: #5865f2; }
+    .add-server { background: #3ba55d; }
+    .chat-surface { flex: 1; background: #36393f; display: flex; flex-direction: column; }
+    .chat-header { padding: 15px; background: #2f3136; color: white; font-weight: bold; }
+    .chat-box { flex: 1; overflow-y: auto; padding: 15px; color: white; }
+    .input-surface { display: flex; padding: 15px; background: #40444b; }
+    #message-input { flex: 1; padding: 10px; border-radius: 5px; border: none; }
+    #send-btn { margin-left: 10px; padding: 10px 20px; background: #5865f2; color: white; border: none; border-radius: 5px; cursor: pointer; }
   </style>
 </head>
 <body>
-  <div class="chat-surface">
-    <div id="chat-box" style="height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;"></div>
-    <div class="input-surface">
-      <input type="text" class="input-fix" id="message-input" placeholder="Type a message...">
-      <button id="send-btn">Send</button>
-      <button id="config-btn">Server Config ⚙️</button>
+  <div class="container">
+    <div class="server-list" id="server-list">
+      <div class="server add-server" id="add-server">+</div>
+    </div>
+    <div class="chat-surface">
+      <div class="chat-header" id="chat-header">Select or Create a Server</div>
+      <div id="chat-box" class="chat-box"></div>
+      <div class="input-surface">
+        <input type="text" id="message-input" placeholder="Type a message...">
+        <button id="send-btn">Send</button>
+      </div>
     </div>
   </div>
 
-  <!-- Config Modal -->
-  <div class="overlay" id="overlay"></div>
-  <div class="modal" id="config-modal">
-    <h3>Server Configuration</h3>
-    <label>Chat Room Name:</label>
-    <input type="text" id="room-name-input" placeholder="Default Room">
-    <label>Server Port (default: 8080):</label>
-    <input type="number" id="port-input" placeholder="8080">
-    <button id="save-config-btn">Save Config</button>
-    <button id="close-config-btn">Close</button>
-  </div>
-
   <script src="/socket.io/socket.io.js"></script>
-  <script src="script.js"></script>
+  <script>
+    const socket = io();
+    const serverList = document.getElementById('server-list');
+    const addServerBtn = document.getElementById('add-server');
+    const chatHeader = document.getElementById('chat-header');
+    const chatBox = document.getElementById('chat-box');
+    const sendBtn = document.getElementById('send-btn');
+    const messageInput = document.getElementById('message-input');
+
+    let currentServer = null;
+
+    addServerBtn.addEventListener('click', () => {
+      const serverName = prompt('Enter server name:');
+      if (serverName) {
+        socket.emit('create server', serverName);
+      }
+    });
+
+    socket.on('server created', ({ id, name }) => {
+      const serverDiv = document.createElement('div');
+      serverDiv.classList.add('server');
+      serverDiv.textContent = name[0].toUpperCase();
+      serverDiv.title = name;
+      serverDiv.addEventListener('click', () => selectServer(id, name));
+      serverList.appendChild(serverDiv);
+    });
+
+    function selectServer(id, name) {
+      currentServer = id;
+      chatHeader.textContent = name;
+      chatBox.innerHTML = '';
+      socket.emit('join server', id);
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    function sendMessage() {
+      const message = messageInput.value.trim();
+      if (message && currentServer) {
+        socket.emit('chat message', { serverId: currentServer, message });
+        appendMessage(`You: ${message}`);
+        messageInput.value = '';
+      }
+    }
+
+    socket.on('chat message', ({ sender, message }) => {
+      appendMessage(`${sender}: ${message}`);
+    });
+
+    function appendMessage(msg) {
+      const msgDiv = document.createElement('div');
+      msgDiv.textContent = msg;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
 </body>
 </html>
