@@ -1,48 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/OxyX1/oxyum-css@3a324169cae2d1506e174dd1a96efe79fd7c9302/oxyum.css">
-    <title>oxyum | chat</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/OxyX1/oxyum-css@3a324169cae2d1506e174dd1a96efe79fd7c9302/oxyum.css">
+  <title>Chat App</title>
 </head>
 <body>
+  <div class="chat-surface">
+    <div id="chat-box" style="height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;"></div>
+    <div class="input-surface">
+      <input type="text" class="input-fix" id="message-input" placeholder="Type a message...">
+      <button id="send-btn">Send</button>
+    </div>
+  </div>
 
-  <canvas id="canvas" width="800" height="600"></canvas>
-  <script type="module">
-    import { ImGui, ImGui_Impl } from "https://cdn.jsdelivr.net/npm/imgui-js/+esm";
-  
-    let serverAddress = new ImGui.ImStringBuffer(256); // For text input
-  
-    async function main() {
-      await ImGui.default();
-      ImGui.CreateContext();
-      ImGui.StyleColorsDark();
-      const canvas = document.getElementById("canvas");
-      ImGui_Impl.Init(canvas);
-  
-      function loop() {
-        ImGui_Impl.NewFrame();
-        ImGui.NewFrame();
-  
-        ImGui.Begin("Server Config");
-        ImGui.Text("Enter server address:");
-        ImGui.InputText("Server Address", serverAddress, serverAddress.buffer_size);
-  
-        if (ImGui.Button("Route")) {
-          console.log(`Routing to ${serverAddress.buffer}:8080`);
-        }
-        ImGui.End();
-  
-        ImGui.Render();
-        ImGui_Impl.RenderDrawData(ImGui.GetDrawData());
-        requestAnimationFrame(loop);
-      }
-      loop();
-    }
-    main();
-  </script>
-  
-
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
