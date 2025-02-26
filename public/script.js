@@ -1,4 +1,4 @@
-// script.js - Handles server creation, joining, and real-time chat functionality
+// script.js - Handles server creation, joining, real-time chat, and notifications
 
 const socket = io();
 let currentServerId = null;
@@ -6,6 +6,7 @@ let currentServerId = null;
 const serverList = document.getElementById('server-list');
 const chatMessages = document.getElementById('chat-messages');
 const messageInput = document.getElementById('message-input');
+const notificationBox = document.getElementById('notifications');
 
 // Load server list
 socket.on('server list', (servers) => {
@@ -16,12 +17,14 @@ socket.on('server list', (servers) => {
 // Add a new server to the list when created
 socket.on('server created', ({ id, name }) => {
   addServerToList(id, name);
+  showNotification(`🟢 New server "${name}" created!`);
 });
 
 // Join server confirmation
 socket.on('server joined', ({ id, name }) => {
   currentServerId = id;
   chatMessages.innerHTML = `<h3>Connected to: ${name}</h3>`;
+  showNotification(`✅ You joined the server "${name}"`);
 });
 
 // Display incoming chat messages
@@ -30,6 +33,11 @@ socket.on('chat message', ({ sender, message }) => {
   msgElement.textContent = `${sender}: ${message}`;
   chatMessages.appendChild(msgElement);
   chatMessages.scrollTop = chatMessages.scrollHeight;
+});
+
+// Handle notifications from the server
+socket.on('notification', (message) => {
+  showNotification(message);
 });
 
 // Handle errors
@@ -69,6 +77,7 @@ function sendMessage() {
   }
 }
 
+// Add server to server list UI
 function addServerToList(id, name) {
   const serverItem = document.createElement('div');
   serverItem.className = 'server-item';
@@ -78,3 +87,23 @@ function addServerToList(id, name) {
   });
   serverList.appendChild(serverItem);
 }
+
+// Show notification with fade-out effect
+function showNotification(message) {
+  const div = document.createElement('div');
+  div.className = 'notification';
+  div.textContent = message;
+  notificationBox.appendChild(div);
+
+  setTimeout(() => {
+    div.style.opacity = '0';
+    setTimeout(() => div.remove(), 1000);
+  }, 5000);
+}
+
+// Track user activity and notify server to reset inactivity timer
+['mousemove', 'keydown', 'click'].forEach((event) => {
+  window.addEventListener(event, () => {
+    socket.emit('user active');
+  });
+});
