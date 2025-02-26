@@ -37,64 +37,6 @@
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
-    const serverList = document.getElementById('server-list');
-    const addServerBtn = document.getElementById('add-server');
-    const chatHeader = document.getElementById('chat-header');
-    const chatBox = document.getElementById('chat-box');
-    const sendBtn = document.getElementById('send-btn');
-    const messageInput = document.getElementById('message-input');
-
-    let currentServer = null;
-
-    addServerBtn.addEventListener('click', () => {
-      const serverName = prompt('Enter server name:');
-      if (serverName) {
-        socket.emit('create server', serverName);
-      }
-    });
-
-    socket.on('server created', ({ id, name }) => {
-      const serverDiv = document.createElement('div');
-      serverDiv.classList.add('server');
-      serverDiv.textContent = name[0].toUpperCase();
-      serverDiv.title = name;
-      serverDiv.addEventListener('click', () => selectServer(id, name));
-      serverList.appendChild(serverDiv);
-    });
-
-    function selectServer(id, name) {
-      currentServer = id;
-      chatHeader.textContent = name;
-      chatBox.innerHTML = '';
-      socket.emit('join server', id);
-    }
-
-    sendBtn.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
-
-    function sendMessage() {
-      const message = messageInput.value.trim();
-      if (message && currentServer) {
-        socket.emit('chat message', { serverId: currentServer, message });
-        appendMessage(`You: ${message}`);
-        messageInput.value = '';
-      }
-    }
-
-    socket.on('chat message', ({ sender, message }) => {
-      appendMessage(`${sender}: ${message}`);
-    });
-
-    function appendMessage(msg) {
-      const msgDiv = document.createElement('div');
-      msgDiv.textContent = msg;
-      chatBox.appendChild(msgDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
