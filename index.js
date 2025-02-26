@@ -43,7 +43,8 @@ io.on('connection', (socket) => {
   // Handle chat messages
   socket.on('chat message', ({ serverId, message }) => {
     if (servers[serverId]) {
-      const chatMsg = { sender: `User-${socket.id.slice(0, 4)}`, message };
+      const sender = `User-${socket.id.slice(0, 4)}`;
+      const chatMsg = { sender, message };
       servers[serverId].messages.push(chatMsg);
       io.to(serverId).emit('chat message', chatMsg);
     }
