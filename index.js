@@ -17,6 +17,7 @@ universal frontend server --> its a server were the user can make whatever they 
 
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const cors = require('cors');
 
 const app = express();
