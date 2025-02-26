@@ -4,7 +4,7 @@
     "version": "1.0.0",
 
     "scripts": {
-        "install": "npm install express http path socket.io uuid",
+        "install": "npm install express http path socket.io uuid web-push",
         "start": "node index.js"
     }
 }
