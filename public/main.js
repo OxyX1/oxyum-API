@@ -1,4 +1,4 @@
-const publicVapidKey = "your-public-vapid-key"; // REPLACE_WITH_YOUR_KEY
+const publicVapidKey = "BAwdJ_8vc1mWrHlrSipnmMi5-lvLRWdH7EW62mIzqD0tohMMOsnhudvTn2Z-qHIEzU7_waJmhkhQWcCsLI4-Y6g"; // REPLACE_WITH_YOUR_KEY
 
 // Check for service worker
 if ("serviceWorker" in navigator) {
