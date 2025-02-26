@@ -1,4 +1,4 @@
-// index.js (Node.js server with server creation and chat functionality)
+// index.js (Node.js server with server creation and joining functionality)
 
 const express = require('express');
 const http = require('http');
@@ -21,6 +21,9 @@ const servers = {}; // { serverId: { name: 'Server Name', users: [], messages: [
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
 
+  // Send the list of available servers to the client
+  socket.emit('server list', Object.entries(servers).map(([id, server]) => ({ id, name: server.name })));
+
   // Handle server creation
   socket.on('create server', (name) => {
     const serverId = uuidv4();
@@ -34,9 +37,12 @@ io.on('connection', (socket) => {
     if (servers[serverId]) {
       socket.join(serverId);
       console.log(`User ${socket.id} joined server ${serverId}`);
+      socket.emit('server joined', { id: serverId, name: servers[serverId].name });
       servers[serverId].messages.forEach((msg) => {
         socket.emit('chat message', msg);
       });
+    } else {
+      socket.emit('error message', 'Server not found.');
     }
   });
 
