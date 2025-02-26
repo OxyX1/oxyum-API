@@ -25,6 +25,10 @@ const port = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+
 app.get('/cloudbrowser', (req, res) => {
     res.json({ message: 'Cloud browser endpoint reached successfully!' });
 });
