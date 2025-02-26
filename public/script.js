@@ -22,7 +22,6 @@ function sendMessage() {
   const message = messageInput.value.trim();
   if (message) {
     socket.emit('chat message', message);
-    appendMessage(`You: ${message}`);
     messageInput.value = '';
   }
 }
