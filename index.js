@@ -1,4 +1,4 @@
-// index.js (Node.js server with server creation and joining functionality)
+// Updated index.js (Node.js server with complete create/join server functionality)
 
 const express = require('express');
 const http = require('http');
@@ -64,3 +64,17 @@ io.on('connection', (socket) => {
 server.listen(8080, () => {
   console.log('Server running on http://localhost:8080');
 });
+
+/*
+To complete the functionality:
+1. **index.html** should include:
+   - Input fields for server name and ID.
+   - Buttons for creating and joining servers.
+   - A dynamic server list display.
+
+2. **script.js** should:
+   - Handle create/join server button clicks.
+   - Render server list received from the server.
+   - Emit appropriate socket events (create server, join server).
+   - Display error messages if server is not found.
+*/

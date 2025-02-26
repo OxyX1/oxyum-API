@@ -1,64 +1,80 @@
+// script.js - Handles server creation, joining, and real-time chat functionality
+
 const socket = io();
+let currentServerId = null;
+
+const serverList = document.getElementById('server-list');
+const chatMessages = document.getElementById('chat-messages');
 const messageInput = document.getElementById('message-input');
-const sendBtn = document.getElementById('send-btn');
-const chatBox = document.getElementById('chat-box');
 
-// Config modal elements
-const configBtn = document.getElementById('config-btn');
-const configModal = document.getElementById('config-modal');
-const overlay = document.getElementById('overlay');
-const saveConfigBtn = document.getElementById('save-config-btn');
-const closeConfigBtn = document.getElementById('close-config-btn');
-const roomNameInput = document.getElementById('room-name-input');
-const portInput = document.getElementById('port-input');
+// Load server list
+socket.on('server list', (servers) => {
+  serverList.innerHTML = '';
+  servers.forEach(({ id, name }) => addServerToList(id, name));
+});
 
-// Chat functionality
-sendBtn.addEventListener('click', sendMessage);
+// Add a new server to the list when created
+socket.on('server created', ({ id, name }) => {
+  addServerToList(id, name);
+});
+
+// Join server confirmation
+socket.on('server joined', ({ id, name }) => {
+  currentServerId = id;
+  chatMessages.innerHTML = `<h3>Connected to: ${name}</h3>`;
+});
+
+// Display incoming chat messages
+socket.on('chat message', ({ sender, message }) => {
+  const msgElement = document.createElement('div');
+  msgElement.textContent = `${sender}: ${message}`;
+  chatMessages.appendChild(msgElement);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+});
+
+// Handle errors
+socket.on('error message', (error) => {
+  alert(error);
+});
+
+// Create server handler
+document.getElementById('create-server').addEventListener('click', () => {
+  const serverName = document.getElementById('server-name').value.trim();
+  if (serverName) {
+    socket.emit('create server', serverName);
+    document.getElementById('server-name').value = '';
+  }
+});
+
+// Join server handler
+document.getElementById('join-server').addEventListener('click', () => {
+  const serverId = document.getElementById('join-server-id').value.trim();
+  if (serverId) {
+    socket.emit('join server', serverId);
+    document.getElementById('join-server-id').value = '';
+  }
+});
+
+// Send message handler
+document.getElementById('send-message').addEventListener('click', sendMessage);
 messageInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') sendMessage();
 });
 
 function sendMessage() {
   const message = messageInput.value.trim();
-  if (message) {
-    socket.emit('chat message', message);
+  if (message && currentServerId) {
+    socket.emit('chat message', { serverId: currentServerId, message });
     messageInput.value = '';
   }
 }
 
-function appendMessage(message) {
-  const msgElement = document.createElement('div');
-  msgElement.textContent = message;
-  chatBox.appendChild(msgElement);
-  chatBox.scrollTop = chatBox.scrollHeight;
+function addServerToList(id, name) {
+  const serverItem = document.createElement('div');
+  serverItem.className = 'server-item';
+  serverItem.textContent = `${name} (ID: ${id})`;
+  serverItem.addEventListener('click', () => {
+    socket.emit('join server', id);
+  });
+  serverList.appendChild(serverItem);
 }
-
-// Listen for incoming messages
-socket.on('chat message', (message) => {
-  appendMessage(`User: ${message}`);
-});
-
-// Modal functionality
-configBtn.addEventListener('click', () => toggleModal(true));
-closeConfigBtn.addEventListener('click', () => toggleModal(false));
-overlay.addEventListener('click', () => toggleModal(false));
-
-function toggleModal(show) {
-  configModal.classList.toggle('active', show);
-  overlay.classList.toggle('active', show);
-}
-
-// Save config changes
-saveConfigBtn.addEventListener('click', () => {
-  const roomName = roomNameInput.value.trim() || 'Default Room';
-  const port = parseInt(portInput.value.trim(), 10) || 8080;
-
-  socket.emit('server config', { roomName, port });
-  appendMessage(`⚙️ Config Updated: Room - ${roomName}, Port - ${port}`);
-  toggleModal(false);
-});
-
-// Receive updated config
-socket.on('config updated', (config) => {
-  appendMessage(`🔧 Server Config Changed: Room - ${config.roomName}, Port - ${config.port}`);
-});
