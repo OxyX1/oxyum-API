@@ -7,18 +7,28 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+let serverConfig = { roomName: 'Default Room', port: 8080 };
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Handle socket connection
+// Handle socket connections
 io.on('connection', (socket) => {
   console.log('A user connected');
 
+  // Handle chat messages
   socket.on('chat message', (msg) => {
-    socket.broadcast.emit('chat message', msg);
+    io.emit('chat message', msg);
+  });
+
+  // Handle server config updates
+  socket.on('server config', (config) => {
+    serverConfig = { ...serverConfig, ...config };
+    console.log('Updated Config:', serverConfig);
+    io.emit('config updated', serverConfig);
   });
 
   socket.on('disconnect', () => {
@@ -26,6 +36,6 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(8080, () => {
-  console.log('Server running on http://localhost:8080');
+server.listen(serverConfig.port, () => {
+  console.log(`Server running on http://localhost:${serverConfig.port}`);
 });

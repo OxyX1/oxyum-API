@@ -4,7 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/OxyX1/oxyum-css@3a324169cae2d1506e174dd1a96efe79fd7c9302/oxyum.css">
-  <title>Chat App</title>
+  <title>Chat App with Config</title>
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      width: 300px;
+    }
+    .modal.active { display: block; }
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+    .overlay.active { display: block; }
+  </style>
 </head>
 <body>
   <div class="chat-surface">
@@ -12,7 +37,20 @@
     <div class="input-surface">
       <input type="text" class="input-fix" id="message-input" placeholder="Type a message...">
       <button id="send-btn">Send</button>
+      <button id="config-btn">Server Config ⚙️</button>
     </div>
+  </div>
+
+  <!-- Config Modal -->
+  <div class="overlay" id="overlay"></div>
+  <div class="modal" id="config-modal">
+    <h3>Server Configuration</h3>
+    <label>Chat Room Name:</label>
+    <input type="text" id="room-name-input" placeholder="Default Room">
+    <label>Server Port (default: 8080):</label>
+    <input type="number" id="port-input" placeholder="8080">
+    <button id="save-config-btn">Save Config</button>
+    <button id="close-config-btn">Close</button>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
