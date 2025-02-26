@@ -66,6 +66,12 @@ app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public", "index.ht
 app.get("/main.js", (req, res) => res.sendFile(path.join(__dirname, "public", "main.js")));
 app.get("/sw.js", (req, res) => res.sendFile(path.join(__dirname, "public", "sw.js")));
 
+function sendPushNotification(title, message) {
+  const payload = { title, message };
+  // Implement sending to stored subscriptions if available
+  console.log(`📩 Sending push: ${title} - ${message}`);
+}
+
 // --- SOCKET.IO LOGIC ---
 io.on("connection", (socket) => {
   console.log(`✅ User connected: ${socket.id}`);
