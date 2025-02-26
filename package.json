@@ -1,0 +1,10 @@
+{
+    "name": "oxyum-networks",
+    "description": "a universal server that is owned by oxyum networks that can be used as a frontend.",
+    "version": "1.0.0",
+
+    "scripts": {
+        "install": "npm install express cors http",
+        "start": "node index.js"
+    }
+}
