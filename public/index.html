@@ -32,11 +32,23 @@
     </div>
   </div>
 
+  <!-- Settings Popup -->
+  <div id="settings-popup" class="popup">
+    <div class="popup-content">
+      <h2>Settings</h2>
+      <label for="new-username">Change Username:</label>
+      <input type="text" id="new-username" placeholder="Enter new username">
+      <button id="update-username">Update</button>
+      <button id="close-settings-popup">Close</button>
+    </div>
+  </div>
+
   <div class="container">
     <div class="sidebar">
       <h2>Servers</h2>
       <div class="server-list" id="server-list"></div>
       <button id="open-server-popup">+ Manage Servers</button>
+      <button id="open-settings-popup">⚙️ Settings</button>
     </div>
     <div class="chat-container">
       <div class="chat-messages" id="chat-messages"></div>

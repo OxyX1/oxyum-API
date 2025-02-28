@@ -17,6 +17,13 @@ const serverPopup = document.getElementById('server-popup');
 const openServerPopupBtn = document.getElementById('open-server-popup');
 const closeServerPopupBtn = document.getElementById('close-server-popup');
 
+// Settings Popup Elements
+const settingsPopup = document.getElementById('settings-popup');
+const openSettingsPopupBtn = document.getElementById('open-settings-popup');
+const closeSettingsPopupBtn = document.getElementById('close-settings-popup');
+const newUsernameInput = document.getElementById('new-username');
+const updateUsernameBtn = document.getElementById('update-username');
+
 // Handle Username Popup
 if (!username) {
   usernamePopup.classList.add('show');
@@ -44,6 +51,29 @@ openServerPopupBtn.addEventListener('click', () => {
 
 closeServerPopupBtn.addEventListener('click', () => {
   serverPopup.classList.remove('show');
+});
+
+// Open & Close Settings Popup
+openSettingsPopupBtn.addEventListener('click', () => {
+  settingsPopup.classList.add('show');
+});
+
+closeSettingsPopupBtn.addEventListener('click', () => {
+  settingsPopup.classList.remove('show');
+});
+
+// Update Username in Settings
+updateUsernameBtn.addEventListener('click', () => {
+  const newUsername = newUsernameInput.value.trim();
+  if (newUsername) {
+    username = newUsername;
+    localStorage.setItem('username', username);
+    socket.emit('update username', username);
+    settingsPopup.classList.remove('show');
+    showNotification(`✅ Username changed to "${username}"`);
+  } else {
+    alert('Username cannot be empty!');
+  }
 });
 
 // Load server list
