@@ -1,12 +1,50 @@
-// script.js - Handles server creation, joining, real-time chat, and notifications
-
 const socket = io();
 let currentServerId = null;
+let username = localStorage.getItem('username') || '';
 
+// DOM Elements
 const serverList = document.getElementById('server-list');
 const chatMessages = document.getElementById('chat-messages');
 const messageInput = document.getElementById('message-input');
 const notificationBox = document.getElementById('notifications');
+
+// Popup Elements
+const usernamePopup = document.getElementById('username-popup');
+const usernameInput = document.getElementById('username-input');
+const saveUsernameBtn = document.getElementById('save-username');
+
+const serverPopup = document.getElementById('server-popup');
+const openServerPopupBtn = document.getElementById('open-server-popup');
+const closeServerPopupBtn = document.getElementById('close-server-popup');
+
+// Handle Username Popup
+if (!username) {
+  usernamePopup.classList.add('show');
+} else {
+  socket.emit('set username', username);
+}
+
+// Save Username from Popup
+saveUsernameBtn.addEventListener('click', () => {
+  const newUsername = usernameInput.value.trim();
+  if (newUsername) {
+    username = newUsername;
+    localStorage.setItem('username', username);
+    socket.emit('set username', username);
+    usernamePopup.classList.remove('show');
+  } else {
+    alert('Username cannot be empty!');
+  }
+});
+
+// Open & Close Server Popup
+openServerPopupBtn.addEventListener('click', () => {
+  serverPopup.classList.add('show');
+});
+
+closeServerPopupBtn.addEventListener('click', () => {
+  serverPopup.classList.remove('show');
+});
 
 // Load server list
 socket.on('server list', (servers) => {
@@ -45,21 +83,23 @@ socket.on('error message', (error) => {
   alert(error);
 });
 
-// Create server handler
+// Create server handler (from popup)
 document.getElementById('create-server').addEventListener('click', () => {
   const serverName = document.getElementById('server-name').value.trim();
   if (serverName) {
     socket.emit('create server', serverName);
     document.getElementById('server-name').value = '';
+    serverPopup.classList.remove('show');
   }
 });
 
-// Join server handler
+// Join server handler (from popup)
 document.getElementById('join-server').addEventListener('click', () => {
   const serverId = document.getElementById('join-server-id').value.trim();
   if (serverId) {
     socket.emit('join server', serverId);
     document.getElementById('join-server-id').value = '';
+    serverPopup.classList.remove('show');
   }
 });
 
@@ -72,7 +112,7 @@ messageInput.addEventListener('keypress', (e) => {
 function sendMessage() {
   const message = messageInput.value.trim();
   if (message && currentServerId) {
-    socket.emit('chat message', { serverId: currentServerId, message });
+    socket.emit('chat message', { serverId: currentServerId, sender: username, message });
     messageInput.value = '';
   }
 }
@@ -81,7 +121,7 @@ function sendMessage() {
 function addServerToList(id, name) {
   const serverItem = document.createElement('div');
   serverItem.className = 'server-item';
-  serverItem.textContent = `${name} (ID: ${id})`;
+  serverItem.textContent = `${name}`;
   serverItem.addEventListener('click', () => {
     socket.emit('join server', id);
   });

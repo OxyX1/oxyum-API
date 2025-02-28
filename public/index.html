@@ -3,33 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Oxyum | CHAT</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/OxyX1/oxyum-css@0ee018dc57179cce698b7c127026dcb920cbe9e8/darkmode.css">
+  <title>oxyum | chat | v2</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/OxyX1/oxyum-css@3a324169cae2d1506e174dd1a96efe79fd7c9302/oxyum.css">
   <script src="/socket.io/socket.io.js"></script>
   <script defer src="script.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    .container { display: flex; height: 100vh; }
-    .sidebar { width: 250px; background: #2f3136; color: white; padding: 1rem; }
-    .server-list, .chat-area { margin-top: 1rem; }
-    .server-item { cursor: pointer; padding: 0.5rem; border-radius: 5px; }
-    .server-item:hover { background: #40444b; }
-    .chat-container { flex-grow: 1; display: flex; flex-direction: column; }
-    .chat-messages { flex-grow: 1; padding: 1rem; overflow-y: auto; background: #36393f; color: white; }
-    .chat-input { display: flex; padding: 1rem; background: #40444b; }
-    .chat-input input { flex-grow: 1; padding: 0.5rem; border-radius: 5px; border: none; }
-    .chat-input button { margin-left: 0.5rem; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="sidebar">
-      <h2>Servers</h2>
-      <div class="server-list" id="server-list"></div>
+
+  <!-- Username Input Popup -->
+  <div id="username-popup" class="popup">
+    <div class="popup-content">
+      <h2>Enter Username</h2>
+      <input type="text" id="username-input" placeholder="Your username">
+      <button id="save-username">Save</button>
+    </div>
+  </div>
+
+  <!-- Server Management Popup -->
+  <div id="server-popup" class="popup">
+    <div class="popup-content">
+      <h2>Manage Servers</h2>
       <input type="text" id="server-name" placeholder="Server name">
       <button id="create-server">Create Server</button>
       <input type="text" id="join-server-id" placeholder="Server ID">
       <button id="join-server">Join Server</button>
+      <button id="close-server-popup">Close</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="sidebar">
+      <h2>Servers</h2>
+      <div class="server-list" id="server-list"></div>
+      <button id="open-server-popup">+ Manage Servers</button>
     </div>
     <div class="chat-container">
       <div class="chat-messages" id="chat-messages"></div>
@@ -40,7 +47,5 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
-  <script src="main.js"></script>
 </body>
 </html>
