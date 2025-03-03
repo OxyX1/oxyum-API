@@ -15,9 +15,14 @@ app.use(express.static(path.join(__dirname, "public")));
 const servers = {}; // { serverId: { name, users, messages } }
 const users = {}; // { socketId: username }
 
+
 io.on("connection", (socket) => {
   let clientIP = socket.handshake.address;
   console.log(`New connection from IP: ${clientIP}`);
+
+  const hashedIP = hashIP(clientIP);
+  console.log(`Hashed IP: ${hashedIP}`);
+  socket.emit("ip info", hashedIP);
 
   console.log(`✅ User connected: ${socket.id}`);
 
