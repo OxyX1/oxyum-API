@@ -3,7 +3,6 @@ const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
-const crypto = require("crypto");
 
 const app = express();
 const server = http.createServer(app);
@@ -16,18 +15,9 @@ app.use(express.static(path.join(__dirname, "public")));
 const servers = {}; // { serverId: { name, users, messages } }
 const users = {}; // { socketId: username }
 
-// Hash IP function
-function hashIP(ip) {
-  return crypto.createHash("sha256").update(ip).digest("hex");
-}
-
 io.on("connection", (socket) => {
   let clientIP = socket.handshake.address;
   console.log(`New connection from IP: ${clientIP}`);
-
-  const hashedIP = hashIP(clientIP);
-  console.log(`Hashed IP: ${hashedIP}`);
-  socket.emit("ip info", hashedIP);
 
   console.log(`✅ User connected: ${socket.id}`);
 
@@ -88,11 +78,6 @@ io.on("connection", (socket) => {
     delete users[socket.id];
   });
 });
-
-
-const userIP = "192.168.1.100";
-const { encrypted, iv: ivHex } = encryptIP(userIP);
-console.log("Encrypted IP:", encrypted);
 
 // --- SERVER START ---
 const PORT = process.env.PORT || 8080;
