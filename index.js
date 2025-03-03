@@ -75,7 +75,9 @@ io.on("connection", (socket) => {
       socket.emit("server joined", { id: serverId, name: servers[serverId].name });
 
       // Send previous messages
-      servers[serverId].messages.forEach((msg) => socket.emit("chat message", msg));
+      servers[serverId].messages.forEach((msg) =>
+        socket.emit("chat message", msg)
+      );
     } else {
       socket.emit("error message", "❌ Server not found.");
     }
@@ -98,11 +100,16 @@ io.on("connection", (socket) => {
   });
 });
 
+<<<<<<< HEAD
+=======
 // Encrypt Example
 const userIP = "192.168.1.100";
 const { encrypted, iv: ivHex } = encryptIP(userIP);
 console.log("Encrypted IP:", encrypted);
 
+>>>>>>> b1c18be6f8b1a184072d83607c8ad33fa32c15b9
 // --- SERVER START ---
 const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+server.listen(PORT, () =>
+  console.log(`🚀 Server running on http://localhost:${PORT}`)
+);
