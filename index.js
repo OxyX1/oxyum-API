@@ -16,20 +16,9 @@ app.use(express.static(path.join(__dirname, "public")));
 const servers = {}; // { serverId: { name, users, messages } }
 const users = {}; // { socketId: username }
 
-// --- HASH FUNCTION FOR IP ---
+// Hash IP function
 function hashIP(ip) {
   return crypto.createHash("sha256").update(ip).digest("hex");
-}
-
-// --- ENCRYPT FUNCTION FOR IP ---
-const secretKey = crypto.randomBytes(32); // Generate a secure 32-byte key
-const iv = crypto.randomBytes(16); // Generate a random IV
-
-function encryptIP(ip) {
-  const cipher = crypto.createCipheriv("aes-256-cbc", secretKey, iv);
-  let encrypted = cipher.update(ip, "utf-8", "hex");
-  encrypted += cipher.final("hex");
-  return { encrypted, iv: iv.toString("hex") };
 }
 
 io.on("connection", (socket) => {
