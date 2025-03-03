@@ -101,6 +101,7 @@ socket.on('chat message', ({ sender, message }) => {
   msgElement.textContent = `${sender}: ${message}`;
   chatMessages.appendChild(msgElement);
   chatMessages.scrollTop = chatMessages.scrollHeight;
+  console.log('\x07');
 });
 
 // Handle notifications from the server

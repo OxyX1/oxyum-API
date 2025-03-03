@@ -3,6 +3,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
+const crypto = require('crypto');
 
 const app = express();
 const server = http.createServer(app);
@@ -16,6 +17,13 @@ const servers = {}; // { serverId: { name, users, messages } }
 const users = {}; // { socketId: username }
 
 io.on("connection", (socket) => {
+  let clientIP = socket.handshake.address;
+  console.log(`New connection from IP: ${clientIP}`);
+
+  const hashedIP = hashIP(clientIP);
+  console.log(`Hashed IP: ${hashedIP}`);
+  socket.emit('ip info', hashedIP);
+
   console.log(`✅ User connected: ${socket.id}`);
 
   // Store Username
@@ -67,6 +75,22 @@ io.on("connection", (socket) => {
     delete users[socket.id];
   });
 });
+
+
+const secretKey = crypto.randomBytes(32);  // Generate a secure 32-byte key
+const iv = crypto.randomBytes(16);         // Generate a random IV
+
+function encryptIP(ip) {
+  const cipher = crypto.createCipheriv('aes-256-cbc', secretKey, iv);
+  let encrypted = cipher.update(ip, 'utf-8', 'hex');
+  encrypted += cipher.final('hex');
+  return { encrypted, iv: iv.toString('hex') };
+}
+
+const userIP = "192.168.1.100";
+const { encrypted, iv: ivHex } = encryptIP(userIP);
+console.log("Encrypted IP:", encrypted);
+
 
 // --- SERVER START ---
 const PORT = process.env.PORT || 8080;
